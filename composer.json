@@ -25,10 +25,5 @@
     },
     "autoload": {
         "psr-4": { "ptheofan\\statemachine\\": "" }
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "2.0.x-dev"
-        }
     }
 }
