@@ -6,12 +6,14 @@
  */
 namespace ptheofan\statemachine;
 
+use Alom\Graphviz\Digraph;
 use Exception;
 use ptheofan\statemachine\exceptions\InvalidSchemaException;
 use ptheofan\statemachine\exceptions\InvalidSchemaSourceException;
 use ptheofan\statemachine\exceptions\StateMachineNotFoundException;
 use ptheofan\statemachine\exceptions\StateNotFoundException;
 use ptheofan\statemachine\interfaces\StateMachineContext;
+use ptheofan\statemachine\interfaces\StateMachineEvent;
 use ptheofan\statemachine\interfaces\StateMachineJournal;
 use SimpleXMLElement;
 use yii;
@@ -28,7 +30,12 @@ class StateMachine extends Component
      * The model that represents journal entries - set to null to disable journal
      * @var string
      */
-    public $journal = 'common\models\sql\SmJournal';
+    public $modelJournal = 'common\\models\\sql\\SmJournal';
+
+    /**
+     * @var string
+     */
+    public $modelTimeout = 'ptheofan\\statemachine\\dbmodels\\SmTimeout';
 
     /**
      * The class tha represents the timeout
@@ -162,13 +169,13 @@ class StateMachine extends Component
     }
 
     /**
-     * @param Event $event
-     * @param Context $context
+     * @param StateMachineEvent $event
+     * @param StateMachineContext $context
      * @return bool
      * @throws Exception
      * @throws \yii\db\Exception
      */
-    public function transition(Event $event, Context $context)
+    public function transition(StateMachineEvent $event, StateMachineContext $context)
     {
         /** @var yii\db\Transaction|false $txn */
         $txn = $this->useTransactions ? $context->getModel()->getDb()->beginTransaction() : false;
@@ -203,8 +210,8 @@ class StateMachine extends Component
             $context->getModel()->save();
 
             // Update Journal - if applicable
-            if ($this->journal) {
-                $journal = $this->journal;
+            if ($this->modelJournal) {
+                $journal = $this->modelJournal;
                 /** @var StateMachineJournal $journal */
                 $journal::nu($context, $event);
             }
@@ -250,8 +257,8 @@ class StateMachine extends Component
             $context->getModel()->save();
 
             // Update Journal - if applicable
-            if ($this->journal) {
-                $journal = $this->journal;
+            if ($this->modelJournal) {
+                $journal = $this->modelJournal;
                 /** @var StateMachineJournal $journal */
                 $journal::nu($context, null);
             }

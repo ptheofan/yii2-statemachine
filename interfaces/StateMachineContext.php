@@ -9,6 +9,7 @@ namespace ptheofan\statemachine\interfaces;
 use Exception;
 use ptheofan\statemachine\StateMachine;
 use yii\db\BaseActiveRecord;
+use yii\web\IdentityInterface;
 
 /**
  * Interface StateMachineContext
@@ -135,7 +136,7 @@ interface StateMachineContext
     /**
      * @param StateMachine $sm
      * @param string $role
-     * @param BaseActiveRecord $user - model of user initiating the context
+     * @param IdentityInterface $user - model of user initiating the context
      * @param BaseActiveRecord $model - model that holds the attribute controlled by the state machine
      * @param string $attr
      * @param string $virtAttr

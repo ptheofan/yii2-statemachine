@@ -12,6 +12,7 @@ use ptheofan\statemachine\interfaces\StateMachineEvent;
 use yii\base\Model;
 use yii\db\BaseActiveRecord;
 use yii\helpers\Json;
+use yii\web\IdentityInterface;
 
 /**
  * Class Context
@@ -269,7 +270,7 @@ class Context extends Model implements StateMachineContext
     /**
      * @param StateMachine $sm
      * @param string $role
-     * @param BaseActiveRecord $user - model of user initiating the context
+     * @param IdentityInterface $user - model of user initiating the context
      * @param BaseActiveRecord $model - model that holds the attribute controlled by the state machine
      * @param string $attr
      * @param string $virtAttr

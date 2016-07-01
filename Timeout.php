@@ -6,9 +6,11 @@
  */
 namespace ptheofan\statemachine;
 
-use common\models\sql\SmTimeout;
+use ptheofan\statemachine\dbmodels\SmTimeout;
+use ptheofan\statemachine\interfaces\StateMachineContext;
+use ptheofan\statemachine\interfaces\StateMachineState;
+use ptheofan\statemachine\interfaces\StateMachineTimeout;
 use SimpleXMLElement;
-use yii\helpers\Json;
 
 /**
  * Class Timeout
@@ -41,9 +43,9 @@ class Timeout extends Event implements StateMachineTimeout
 
     /**
      * Call this function to clean up registered timeouts
-     * @param Context $context
+     * @param StateMachineContext $context
      */
-    public static function cleanUp(Context $context)
+    public static function cleanUp(StateMachineContext $context)
     {
         $model = $context->getModel();
         $modelName = $model::className();
@@ -51,37 +53,45 @@ class Timeout extends Event implements StateMachineTimeout
         $virtAttr = $context->getVirtAttr();
         $smName = $context->getSm()->name;
 
-        SmTimeout::deleteAll('model = :model AND model_pk = :model_pk AND virtual_attribute = :virtAttr AND sm_name = :smName', [
-            'model' => $modelName,
-            'model_pk' => $modelPk,
-            'virtAttr' => $virtAttr,
-            'smName' => $smName,
-        ]);
+        $dbClass = $context->getSm()->modelTimeout;
+        if ($dbClass) {
+            /** @var SmTimeout $dbClass */
+            $dbClass::deleteAll('model = :model AND model_pk = :model_pk AND virtual_attribute = :virtAttr AND sm_name = :smName', [
+                'model' => $modelName,
+                'model_pk' => $modelPk,
+                'virtAttr' => $virtAttr,
+                'smName' => $smName,
+            ]);
+        }
     }
 
     /**
-     * @param Context $context
+     * @param StateMachineContext $context
      */
-    public function register(Context $context)
+    public function register(StateMachineContext $context)
     {
-        $m = new SmTimeout();
+        $dbClass = $context->getSm()->modelTimeout;
+        if ($dbClass) {
+            /** @var SmTimeout $m */
+            $m = new $dbClass();
 
-        $m->model = $context->getModelClassName();
-        $m->virtual_attribute = $context->getVirtAttr();
-        $m->sm_name = $context->getSm()->name;
-        $m->event_name = $this->getLabel();
-        $m->expires_at = $this->getExpiresAt();
-        $m->model_pk = $context->getModelPk();
-        $m->save();
+            $m->model = $context->getModelClassName();
+            $m->virtual_attribute = $context->getVirtAttr();
+            $m->sm_name = $context->getSm()->name;
+            $m->event_name = $this->getLabel();
+            $m->expires_at = $this->getExpiresAt();
+            $m->model_pk = $context->getModelPk();
+            $m->save();
+        }
     }
 
     /**
      * @param SimpleXMLElement $xml
      * @param StateMachine $sm
-     * @param State $state
+     * @param StateMachineState $state
      * @return static
      */
-    public static function fromXml(SimpleXMLElement $xml, StateMachine $sm, State $state)
+    public static function fromXml(SimpleXMLElement $xml, StateMachine $sm, StateMachineState $state)
     {
         /** @var Timeout $rVal */
         $rVal = parent::fromXml($xml, $sm, $state);

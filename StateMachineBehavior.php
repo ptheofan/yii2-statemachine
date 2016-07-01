@@ -6,25 +6,24 @@
  */
 namespace ptheofan\statemachine;
 
-use common\components\MySqlActiveRecord;
-use common\models\sql\User;
-use common\sm\exceptions\CannotGuessEventException;
-use common\sm\exceptions\EventNotFoundException;
-use common\sm\exceptions\InvalidSchemaException;
-use common\sm\exceptions\StateMachineNotFoundException;
-use common\sm\exceptions\TransitionException;
-use Yii;
+use ptheofan\statemachine\exceptions\EventNotFoundException;
+use ptheofan\statemachine\exceptions\InvalidSchemaException;
+use ptheofan\statemachine\exceptions\StateNotFoundException;
+use ptheofan\statemachine\interfaces\StateMachineContext;
+use ptheofan\statemachine\interfaces\StateMachineEvent;
+use yii;
 use yii\base\Behavior;
 use yii\base\Exception;
 use yii\base\InvalidValueException;
 use yii\db\ActiveRecord;
+use yii\db\BaseActiveRecord;
 
 /**
  * Class StateMachineBehavior
- * @package common\sm
+ * @package ptheofan\statemachine
  *
- * @method MySqlActiveRecord getOwner()
- * @property MySqlActiveRecord $owner
+ * @method BaseActiveRecord getOwner()
+ * @property BaseActiveRecord $owner
  */
 class StateMachineBehavior extends Behavior
 {
@@ -44,6 +43,11 @@ class StateMachineBehavior extends Behavior
      * @var StateMachine
      */
     public $sm;
+
+    /**
+     * @var callable $userRoleGetter(IdentityInterface $user)
+     */
+    public $userRoleGetter = 'getUserRole';
 
     /**
      * @return array
@@ -76,27 +80,46 @@ class StateMachineBehavior extends Behavior
     }
 
     /**
+     * @param yii\web\IdentityInterface|null $identity
+     * @return mixed|null
+     */
+    protected function internalGetUserRole($identity)
+    {
+        if ($this->userRoleGetter) {
+            if (!$identity) {
+                $identity = Yii::$app->user->identity;
+            }
+
+            $getter = is_string($this->userRoleGetter) ? [$this, $this->userRoleGetter] : $this->userRoleGetter;
+            return call_user_func($getter, $identity);
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * @param string|null $role
-     * @return Context
+     * @return StateMachineContext
      */
     public function createContext($role = null)
     {
         $m = $this->owner;
-        if (!$role) {
-            $role = $m->getUserRole(Yii::$app->user->identity);
+        $identity = Yii::$app->user->getIdentity(false);
+        if ($role === null) {
+            $role = $this->internalGetUserRole($identity);
         }
 
-        return Context::nu($this->sm, $role, Yii::$app->user->identity, $m, $this->attr, $this->virtAttr);
+        return Context::nu($this->sm, $role, $identity, $m, $this->attr, $this->virtAttr);
     }
 
     /**
-     * @param string|Event $event
+     * @param string|StateMachineEvent $event
      * @param string|null|false $role - null means automatically set role, false will explicitly NOT use any role
-     * @return Context
+     * @return StateMachineContext
      * @throws EventNotFoundException
      * @throws InvalidSchemaException
+     * @throws StateNotFoundException
      * @throws \Exception
-     * @throws exceptions\StateNotFoundException
      */
     public function trigger($event, $role = null)
     {
@@ -107,7 +130,7 @@ class StateMachineBehavior extends Behavior
 
         // Role
         if ($role === null) {
-            $role = $m->getUserRole(Yii::$app->user->getIdentity(false));
+            $role = $this->internalGetUserRole(Yii::$app->user->getIdentity(false));
         }
 
         // Event
