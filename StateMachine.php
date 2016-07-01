@@ -30,7 +30,7 @@ class StateMachine extends Component
      * The model that represents journal entries - set to null to disable journal
      * @var string
      */
-    public $modelJournal = 'common\\models\\sql\\SmJournal';
+    public $modelJournal = 'ptheofan\\statemachine\\dbmodels\\SmJournal';
 
     /**
      * @var string
@@ -144,7 +144,7 @@ class StateMachine extends Component
             // SimpleXMLElement
             if ($schemaSource instanceof SimpleXMLElement) {
                 $this->__xml = $schemaSource;
-            } elseif (StringHelper::startsWith($schemaSource, '<?xml')) {
+            } elseif (substr($schemaSource, 0, 5) === '<?xml') {
                 // XML in a string
                 $this->__xml = simplexml_load_string($schemaSource);
             } else {

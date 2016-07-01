@@ -128,6 +128,12 @@ interface StateMachineContext
     public function hasErrors($attribute = null);
 
     /**
+     * @param string $attribute
+     * @return array errors - @see yii\base\Model
+     */
+    public function getErrors($attribute = null);
+
+    /**
      * A string representing the id of the model.
      * @return string
      */

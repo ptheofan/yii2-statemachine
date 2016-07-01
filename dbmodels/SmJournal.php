@@ -16,6 +16,25 @@ use yii\db\ActiveRecord;
 class SmJournal extends ActiveRecord implements StateMachineJournal
 {
     /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => yii\behaviors\BlameableBehavior::className(),
+                'updatedByAttribute' => false,
+            ],
+            [
+                'class' => yii\behaviors\TimestampBehavior::className(),
+                'value' => new yii\db\Expression('NOW()'),
+                'createdAtAttribute' => 'created_at',
+                'updatedAtAttribute' => false,
+            ],
+        ];
+    }
+
+    /**
      * @param StateMachineContext $context
      * @param StateMachineEvent|null $event - this is null when an item enters the SM for the first time
      * @return static
@@ -25,12 +44,16 @@ class SmJournal extends ActiveRecord implements StateMachineJournal
         $j = new static();
         $m = $context->getModel();
         $j->role = $context->getRole();
-        $j->created_by = $context->getUser()->getId();
+        $user = $context->getUser();
+        if ($user) {
+            $j->created_by = $user->getId();
+        }
+
         $j->model = $m::className();
         $j->sm_name = $context->getSm()->name;
         $j->attr = $context->getAttr();
         $j->model_pk = $context->getModelPk();
-
+        
         if ($event) {
             $j->from_state = $event->getState()->getValue();
             $j->to_state = $event->getTargetState()->getValue();

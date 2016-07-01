@@ -29,14 +29,14 @@ interface StateMachineEvent
     public function getTarget();
 
     /**
-     * @return StateMachineEvent
+     * @return StateMachineState
      * @throws InvalidSchemaException
      * @throws StateNotFoundException
      */
     public function getTargetState();
 
     /**
-     * @return StateMachineEvent
+     * @return StateMachineState
      */
     public function getState();
 

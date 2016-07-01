@@ -90,7 +90,7 @@ class StateMachineBehavior extends Behavior
                 $identity = Yii::$app->user->identity;
             }
 
-            $getter = is_string($this->userRoleGetter) ? [$this, $this->userRoleGetter] : $this->userRoleGetter;
+            $getter = is_string($this->userRoleGetter) ? [$this->owner, $this->userRoleGetter] : $this->userRoleGetter;
             return call_user_func($getter, $identity);
         } else {
             return null;
