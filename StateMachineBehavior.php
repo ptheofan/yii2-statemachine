@@ -6,9 +6,11 @@
  */
 namespace ptheofan\statemachine;
 
+use ptheofan\statemachine\exceptions\CannotGuessEventException;
 use ptheofan\statemachine\exceptions\EventNotFoundException;
 use ptheofan\statemachine\exceptions\InvalidSchemaException;
 use ptheofan\statemachine\exceptions\StateNotFoundException;
+use ptheofan\statemachine\exceptions\TransitionException;
 use ptheofan\statemachine\interfaces\StateMachineContext;
 use ptheofan\statemachine\interfaces\StateMachineEvent;
 use yii;
@@ -224,7 +226,7 @@ class StateMachineBehavior extends Behavior
                     throw new InvalidSchemaException("Cannot load current state {$m->{$this->attr}}");
                 }
 
-                $event = $state->guessEvent($value, $m->getUserRole(Yii::$app->user->identity));
+                $event = $state->guessEvent($value, $this->internalGetUserRole(Yii::$app->user->identity));
                 $context = $this->trigger($event);
             }
 

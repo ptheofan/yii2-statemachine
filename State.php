@@ -143,11 +143,7 @@ class State extends Object implements StateMachineState
         /** @var StateMachineEvent $event */
         foreach ($events as $event) {
             if ($event->getLabel() === $label) {
-                if ($role) {
-                    if ($event->hasRole($role)) {
-                        return $event;
-                    }
-                } else {
+                if ($event->isRoleValid($role)) {
                     return $event;
                 }
             }
@@ -193,7 +189,7 @@ class State extends Object implements StateMachineState
         $events = $this->getEventsTargeting($target);
         $candidates = [];
         foreach ($events as $event) {
-            if (in_array($role, $event->getRoles())) {
+            if ($event->isRoleValid($role)) {
                 $candidates[] = $event;
             }
         }

@@ -52,6 +52,12 @@ interface StateMachineEvent
     public function hasRole($role);
 
     /**
+     * @param string $role
+     * @return bool
+     */
+    public function isRoleValid($role);
+
+    /**
      * Test if the event can be triggered by ALL of $roles
      * @param array|string $roles
      * @return bool

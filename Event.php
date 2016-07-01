@@ -90,6 +90,19 @@ class Event extends Object implements StateMachineEvent
     }
 
     /**
+     * @param string $role
+     * @return bool
+     */
+    public function isRoleValid($role)
+    {
+        if (!$role || empty($this->roles)) {
+            return true;
+        }
+
+        return in_array($role, $this->roles);
+    }
+
+    /**
      * Test if the event can be triggered by ALL of $roles
      * @param array|string $roles
      * @return bool
