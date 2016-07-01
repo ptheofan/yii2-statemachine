@@ -2,7 +2,9 @@
 <state-machine name="account" initialState="draft">
     <!-- Property was just created -->
     <state value="draft" label="Draft">
-        <event target="verified" label="verify"/>
+        <event target="verified" label="verify">
+            <role>guest</role>
+        </event>
         <event target="draft" label="resend.verification.email">
             <role>owner</role>
         </event>
@@ -18,7 +20,7 @@
     </state>
 
     <state value="cancelled">
-        <timeout target="cleanup" label="timeout">
+        <timeout target="cleanup" label="timeout" days="1">
             <role>system</role>
         </timeout>
     </state>
