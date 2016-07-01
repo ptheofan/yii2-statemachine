@@ -1,6 +1,8 @@
 # yii2-statemachine
 State Machine for modern Web Apps for the Yii2 framework
 
+-- A more elaborate documentation is on its way :)
+If you have any questions, raise an issue.
 
 Install using composer (command line)
 ```bash
@@ -42,7 +44,7 @@ controlled by state machines in the same class you have to add the behavior mult
 ```
 
 
-# 3. Roles Based schema.
+### 3. Roles Based schema.
 In this scenario we are also using roles. Roles are simple strings declared in the xml file for each action (optional). Since most
 commonly you will be needing roles, let's add a function in the User model that will inform the state machine of the current user's role.
 The name, the function, even when the function is can be adjusted from the StateMachine configuration (config section). See the
@@ -75,7 +77,7 @@ StateMachine class for details.
 ```
 
 
-#4 Ready to use
+##4 Ready to use
 Finally the configuration of the state machine is ready! Here's a simple example with some cases
 
 ```php
