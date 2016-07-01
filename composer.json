@@ -1,7 +1,7 @@
 {
     "name": "ptheofan/yii2-statemachine",
     "description": "A state machine for modern Web Apps",
-    "keywords": ["yii2", "StateMachine", "Persistent", "Timeout", "State"],
+    "keywords": ["yii2", "StateMachine", "Timeout", "State"],
     "type": "yii2-extension",
     "license": "BSD-3-Clause",
     "support": {
