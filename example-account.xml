@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<state-machine name="account" initialState="draft">
+    <!-- Property was just created -->
+    <state value="draft" label="Draft">
+        <event target="verified" label="verify"/>
+        <event target="draft" label="resend.verification.email">
+            <role>owner</role>
+        </event>
+        <event target="cancelled" label="delete.account">
+            <role>owner</role>
+        </event>
+    </state>
+
+    <state value="verified">
+        <event target="cancelled" label="delete.account">
+            <role>owner</role>
+        </event>
+    </state>
+
+    <state value="cancelled">
+        <timeout target="cleanup" label="timeout">
+            <role>system</role>
+        </timeout>
+    </state>
+
+    <state value="cleanup" label="clean.up">
+
+    </state>
+</state-machine>

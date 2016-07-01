@@ -1,0 +1,34 @@
+{
+    "name": "ptheofan/yii2-statemachine",
+    "description": "A state machine for modern Web Apps",
+    "keywords": ["yii2", "StateMachine", "Persistent", "Timeout", "State"],
+    "type": "yii2-extension",
+    "license": "BSD-3-Clause",
+    "support": {
+        "source": "https://github.com/ptheofan/yii2-statemachine"
+    },
+    "authors": [
+        {
+            "name": "Paris Theofanidis",
+            "email": "ptheofan@gmail.com"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@github.com:ptheofan/graphviz.git"
+        }
+    ],
+    "require": {
+        "yiisoft/yii2": ">=2.0.4",
+        "alom/graphviz": "dev-hackhtmllabels"
+    },
+    "autoload": {
+        "psr-4": { "ptheofan\\statemachine\\": "" }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.0.x-dev"
+        }
+    }
+}
