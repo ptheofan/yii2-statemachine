@@ -15,7 +15,7 @@
     ],
     "require": {
         "yiisoft/yii2": ">=2",
-        "ptheofan/yii2-behaviors": "dev-master"
+        "ptheofan/yii2-behaviors": ">=1"
     },
     "autoload": {
         "psr-4": { "ptheofan\\statemachine\\": "" }
