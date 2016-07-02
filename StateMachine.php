@@ -177,6 +177,9 @@ class StateMachine extends Component
      */
     public function transition(StateMachineEvent $event, StateMachineContext $context)
     {
+        // Let the context know which event triggered the transition
+        $context->setEvent($event);
+
         /** @var yii\db\Transaction|false $txn */
         $txn = $this->useTransactions ? $context->getModel()->getDb()->beginTransaction() : false;
 
@@ -222,6 +225,7 @@ class StateMachine extends Component
             return true;
         } catch (Exception $e) {
             $txn && $txn->rollBack();
+            $context->attachException($e);
             throw $e;
         }
     }
@@ -269,6 +273,7 @@ class StateMachine extends Component
             return true;
         } catch (Exception $e) {
             $txn && $txn->rollBack();
+            $context->attachException($e);
             throw $e;
         }
     }

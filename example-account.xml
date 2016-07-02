@@ -2,8 +2,13 @@
 <state-machine name="account" initialState="draft">
     <!-- Property was just created -->
     <state value="draft" label="Draft">
+        <enter>
+            <command class="ReportStateTransition"/>
+            <command class="SendVerificationEmail"/>
+        </enter>
+
         <event target="verified" label="verify">
-            <role>guest</role>
+            <role>owner</role>
         </event>
         <event target="draft" label="resend.verification.email">
             <role>owner</role>
@@ -11,21 +16,46 @@
         <event target="cancelled" label="delete.account">
             <role>owner</role>
         </event>
+
+        <exit>
+            <command class="ReportStateTransition" verb="Leaving"/>
+        </exit>
     </state>
 
     <state value="verified">
+        <enter>
+            <command class="ReportStateTransition"/>
+        </enter>
+
         <event target="cancelled" label="delete.account">
             <role>owner</role>
         </event>
+
+        <exit>
+            <command class="ReportStateTransition" verb="Leaving"/>
+        </exit>
     </state>
 
     <state value="cancelled">
+        <enter>
+            <command class="ReportStateTransition"/>
+        </enter>
+
+        <event target="draft" label="recover">
+            <role>owner</role>
+        </event>
         <timeout target="cleanup" label="timeout" days="1">
             <role>system</role>
         </timeout>
+
+        <exit>
+            <command class="ReportStateTransition" verb="Leaving"/>
+        </exit>
     </state>
 
     <state value="cleanup" label="clean.up">
-
+        <enter>
+            <command class="ReportStateTransition"/>
+        </enter>
     </state>
 </state-machine>

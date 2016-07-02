@@ -163,14 +163,18 @@ class StateMachineBehavior extends Behavior
     }
 
     /**
+     * @param string|null|false $role - null will auto-detect user role, false will get every possible trigger regardless role
      * @return Event[]
      * @throws InvalidSchemaException
-     * @throws exceptions\StateNotFoundException
+     * @throws StateNotFoundException
      */
-    public function getTriggers()
+    public function getTriggers($role = null)
     {
         $m = $this->owner;
-        $role = $m->getUserRole(Yii::$app->user->identity);
+        if ($role === null) {
+            $role = $this->internalGetUserRole(Yii::$app->user->identity);
+        }
+
         return $this->sm->getState($m->{$this->attr})->getEvents($role);
     }
 
@@ -189,6 +193,14 @@ class StateMachineBehavior extends Behavior
         $this->sm->initStateMachineAttribute($context);
 
         return $context;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->owner->{$this->attr};
     }
 
     /**

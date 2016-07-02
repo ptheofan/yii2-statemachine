@@ -28,7 +28,7 @@ abstract class Command extends Object
     /**
      * Execute the command on the $context
      * @param StateMachineContext $context
-     * @return mixed
+     * @return bool
      */
     public abstract function execute(StateMachineContext $context);
 
@@ -71,7 +71,7 @@ abstract class Command extends Object
 
         $command = Yii::createObject($config);
         if (!($command instanceof Command)) {
-            throw new InvalidSchemaException("All state machine commands must extend the Command");
+            throw new InvalidSchemaException("All state machine commands must derive from ptheofan\\statemachine\\commands\\Command");
         }
 
         $command->sm = $sm;

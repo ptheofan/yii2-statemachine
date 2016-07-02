@@ -2,6 +2,7 @@
 
 namespace ptheofan\statemachine\dbmodels;
 
+use ptheofan\behaviors\mysql\SqlToTimestampBehavior;
 use ptheofan\statemachine\exceptions\EventNotFoundException;
 use ptheofan\statemachine\interfaces\StateMachineContext;
 use ptheofan\statemachine\StateMachineBehavior;
@@ -22,7 +23,7 @@ class SmTimeout extends ActiveRecord
     {
         $rVal = parent::behaviors();
         $rVal['timestamp'] = [
-            'class' => SqlToTimestampBehavior::class,
+            'class' => SqlToTimestampBehavior::className(),
             'attributes' => ['expires_at'],
         ];
 

@@ -203,11 +203,6 @@ class State extends Object implements StateMachineState
         }
     }
 
-    public function isTemporary()
-    {
-        
-    }
-
     /**
      * @param array $profile - appearance profile
      * @return array

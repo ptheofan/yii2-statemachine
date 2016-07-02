@@ -13,15 +13,9 @@
             "email": "ptheofan@gmail.com"
         }
     ],
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "git@github.com:ptheofan/graphviz.git"
-        }
-    ],
     "require": {
-        "yiisoft/yii2": ">=2.0.4",
-        "alom/graphviz": "dev-hackhtmllabels"
+        "yiisoft/yii2": ">=2",
+        "ptheofan/yii2-behaviors": "dev-master"
     },
     "autoload": {
         "psr-4": { "ptheofan\\statemachine\\": "" }
