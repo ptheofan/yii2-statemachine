@@ -19,6 +19,21 @@ use SimpleXMLElement;
 interface StateMachineState
 {
     /**
+     * @return boolean
+     */
+    public function isFinal();
+
+    /**
+     * @return boolean
+     */
+    public function isInitial();
+
+    /**
+     * @return boolean
+     */
+    public function isIntermediate();
+
+    /**
      * @return string
      */
     public function getLabel();
@@ -69,12 +84,6 @@ interface StateMachineState
      * @throws CannotGuessEventException
      */
     public function guessEvent($target, $role);
-
-    /**
-     * @param array $profile - appearance profile
-     * @return array
-     */
-    public function dot($profile);
 
     /**
      * @return string

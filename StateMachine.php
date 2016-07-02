@@ -319,65 +319,13 @@ class StateMachine extends Component
     {
         $xml = $this->getXml();
         $stateXml = $xml->xpath('state');
+        $rVal = [];
         foreach ($stateXml as $item) {
             $value = (string)$item->attributes()->value;
+            $rVal[] = $this->getState($value);
             $this->getState($value);
         }
 
-        return $this->states;
-    }
-
-    /**
-     * @param array $profile - appearance profile
-     * @return string
-     */
-    public function dot($profile)
-    {
-        $graph = new Digraph('G');
-        $graph->set('truecolor', true);
-
-        foreach ($this->getStates() as $state) {
-            $graph->node($state->getValue(), $state->dot($profile['states']));
-        }
-
-        foreach ($this->getStates() as $state) {
-            /** @var Event[] $connectors */
-            $connectors = array_merge($state->getEvents(), $state->getTimeOuts());
-            foreach ($connectors as $event) {
-                $p = $profile['events']['default'];
-
-                foreach ($profile['events']['exclusiveRoles'] as $exclusiveRole => $roleProfile) {
-                    if ($event->isExclusiveTo($exclusiveRole)) {
-                        $p = array_merge($p, $roleProfile);
-                        break;
-                    }
-                }
-
-                if ($event instanceof Timeout) {
-                    $p = array_merge($p, $profile['events']['timeout']);
-                } elseif ($event->isRefresh()) {
-                    $p = array_merge($p, $profile['events']['refresh']);
-                }
-
-                $fontcolor = $p['fontcolor'];
-                $fillcolor = $p['fillcolor'];
-                $color = $p['color'];
-                $style = $p['style'];
-
-                $graph->edge([$state->getValue(), $event->getTarget()], [
-                    'label' => chr(1) . '<<table border="0" cellspacing="0" cellpadding="2"><tr><td>' . $event->getLabel() . '</td></tr></table>>',
-                    'margin' => 10,
-                    'arrowsize' => 0.6,
-                    'fontsize' => 9,
-                    'fontname' => 'Helvetica Neue',
-                    'fontcolor' => $fontcolor,
-                    'fillcolor' => $fillcolor,
-                    'color' => $color,
-                    'style' => $style,
-                ]);
-            }
-        }
-
-        return $graph->render();
+        return $rVal;
     }
 }
