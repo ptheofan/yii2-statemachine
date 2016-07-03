@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
 <state-machine name="account" initialState="draft">
-    <!-- Property was just created -->
     <state value="draft" label="Draft">
         <enter>
             <command class="ReportStateTransition"/>
