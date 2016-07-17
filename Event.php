@@ -175,13 +175,7 @@ class Event extends Object implements StateMachineEvent
             }
         }
 
-        if (empty($xml->role)) {
-            if (empty($rVal->label)) {
-                $rVal->roles = ['system'];
-            } else {
-                $rVal->roles = ['owner', 'admin'];
-            }
-        } else {
+        if (!empty($xml->role)) {
             foreach ($xml->role as $roleXml) {
                 $rVal->roles[] = (string)$roleXml;
             }
