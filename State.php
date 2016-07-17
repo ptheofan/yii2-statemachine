@@ -8,6 +8,7 @@ namespace ptheofan\statemachine;
 
 use ptheofan\statemachine\commands\Command;
 use ptheofan\statemachine\exceptions\CannotGuessEventException;
+use ptheofan\statemachine\interfaces\StateMachineContext;
 use ptheofan\statemachine\interfaces\StateMachineEvent;
 use ptheofan\statemachine\interfaces\StateMachineState;
 use ptheofan\statemachine\interfaces\StateMachineTimeout;
@@ -118,16 +119,17 @@ class State extends Object implements StateMachineState
 
     /**
      * @param string|null $role
-     * @return StateMachineEvent[]
+     * @param StateMachineContext|null $context
+     * @return interfaces\StateMachineEvent[]
      */
-    public function getEvents($role = null)
+    public function getEvents($role = null, $context = null)
     {
         if ($role === null) {
             return $this->events;
         } else {
-            return array_filter($this->events, function($e) use ($role) {
+            return array_filter($this->events, function($e) use ($role, $context) {
                 /** @var StateMachineEvent $e */
-                return $e->isEligible($role);
+                return $e->isEligible($role, $context);
             });
         }
     }

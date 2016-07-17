@@ -89,7 +89,12 @@ class StateMachine extends Component
     /**
      * @var string - default namespace for the commands (will be used if provided commands do not already provide namespace)
      */
-    public $commandsNamespace = '\\app\\sm\\commands';
+    public $commandsNamespace = '\\ptheofan\\statemachine\\commands';
+
+    /**
+     * @var string - default namespace for the conditions (will be used if provided conditions do not already provide namespace)
+     */
+    public $conditionsNamespace = '\\ptheofan\\statemachine\\conditions';
 
     /**
      * The cached states

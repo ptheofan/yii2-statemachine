@@ -62,6 +62,14 @@ class Context extends Model implements StateMachineContext
     private $exceptions = [];
 
     /**
+     * @return interfaces\StateMachineEvent[]
+     */
+    public function getPossibleEvents()
+    {
+        return $this->sm->getState($this->model->{$this->attr})->getEvents($this->role, $this);
+    }
+
+    /**
      * @param StateMachineEvent $e
      * @return $this
      */

@@ -170,12 +170,8 @@ class StateMachineBehavior extends Behavior
      */
     public function getTriggers($role = null)
     {
-        $m = $this->owner;
-        if ($role === null) {
-            $role = $this->internalGetUserRole(Yii::$app->user->identity);
-        }
-
-        return $this->sm->getState($m->{$this->attr})->getEvents($role);
+        $context = $this->createContext($role);
+        return $context->getPossibleEvents();
     }
 
     /**

@@ -6,6 +6,7 @@
  */
 namespace ptheofan\statemachine\interfaces;
 
+use ptheofan\statemachine\Context;
 use ptheofan\statemachine\exceptions\InvalidSchemaException;
 use ptheofan\statemachine\exceptions\StateNotFoundException;
 use ptheofan\statemachine\StateMachine;
@@ -59,10 +60,12 @@ interface StateMachineEvent
 
     /**
      * Test if the event can be triggered by ALL of $roles
+     *
      * @param array|string $roles
+     * @param StateMachineContext|null $context
      * @return bool
      */
-    public function isEligible($roles);
+    public function isEligible($roles, $context);
 
     /**
      * Will return true if ONLY the $roles can trigger this event

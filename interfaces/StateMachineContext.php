@@ -19,6 +19,12 @@ use yii\web\IdentityInterface;
 interface StateMachineContext
 {
     /**
+     * Get a list of possible valid events (triggers) for this context
+     * @return StateMachineEvent[]
+     */
+    public function getPossibleEvents();
+
+    /**
      * @param StateMachineEvent $e
      * @return $this
      */

@@ -6,11 +6,18 @@
  */
 namespace ptheofan\statemachine;
 
+use ptheofan\statemachine\conditions\Condition;
+use ptheofan\statemachine\interfaces\StateMachineContext;
 use ptheofan\statemachine\interfaces\StateMachineEvent;
 use ptheofan\statemachine\interfaces\StateMachineState;
 use SimpleXMLElement;
 use yii\base\Object;
 
+/**
+ * Class Event
+ *
+ * @package ptheofan\statemachine
+ */
 class Event extends Object implements StateMachineEvent
 {
     /**
@@ -42,6 +49,11 @@ class Event extends Object implements StateMachineEvent
      * @var array
      */
     protected $data;
+
+    /**
+     * @var Condition[]
+     */
+    protected $conditions = [];
 
     /**
      * @return string
@@ -109,16 +121,32 @@ class Event extends Object implements StateMachineEvent
 
     /**
      * Test if the event can be triggered by ALL of $roles
+     *
      * @param array|string $roles
+     * @param StateMachineContext|null $context
      * @return bool
      */
-    public function isEligible($roles)
+    public function isEligible($roles, $context = null)
     {
         if (!is_array($roles)) {
-            return in_array($roles, $this->roles);
+            if (!in_array($roles, $this->roles)) {
+                return false;
+            }
         } else {
-            return array_diff($roles, $this->roles) === [];
+            if (array_diff($roles, $this->roles) !== []) {
+                return false;
+            }
         }
+
+        if ($context) {
+            foreach ($this->conditions as $condition) {
+                if (!$condition->check($context)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -179,6 +207,11 @@ class Event extends Object implements StateMachineEvent
             foreach ($xml->role as $roleXml) {
                 $rVal->roles[] = (string)$roleXml;
             }
+        }
+
+        $conditions = !empty($xml->conditions) ? $xml->conditions[0]->condition : [];
+        foreach ($conditions as $condition) {
+            $rVal->conditions[] = Condition::fromXml($condition, $sm);
         }
 
         return $rVal;
