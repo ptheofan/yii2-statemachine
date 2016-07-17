@@ -28,7 +28,7 @@ class AttributeCheck extends Condition
     /**
      * @var true/false
      */
-    public $strictMode;
+    public $strictMode = false;
 
     /**
      *
