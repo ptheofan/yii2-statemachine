@@ -288,7 +288,7 @@ class StateMachine extends Component
     public function getState($value)
     {
         if ($value === null) {
-            return null;
+            $value = $this->getInitialStateValue();
         }
         
         if (isset($this->states[$value])) {
