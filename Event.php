@@ -39,6 +39,11 @@ class Event extends Object implements StateMachineEvent
     protected $state;
 
     /**
+     * @var array
+     */
+    protected $data;
+
+    /**
      * @return string
      */
     public function getLabel()
@@ -139,6 +144,16 @@ class Event extends Object implements StateMachineEvent
     }
 
     /**
+     * @param string $name
+     * @param mixed $default
+     * @return string
+     */
+    public function getValue($name, $default)
+    {
+        return (array_key_exists($name, $this->data)) ? $this->data[$name] : $default;
+    }
+
+    /**
      * @param SimpleXMLElement $xml
      * @param StateMachine $sm
      * @param StateMachineState $state
@@ -152,6 +167,13 @@ class Event extends Object implements StateMachineEvent
 
         $rVal->target = (string)$xml->attributes()->target;
         $rVal->label = (string)$xml->attributes()->label;
+
+        $rVal->data = [];
+        foreach ($xml->attributes() as $k => $v) {
+            if (!in_array($k, ['target', 'label'])) {
+                $rVal->data[$k] = (string)$v;
+            }
+        }
 
         if (empty($xml->role)) {
             if (empty($rVal->label)) {

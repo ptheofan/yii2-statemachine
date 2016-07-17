@@ -77,6 +77,13 @@ interface StateMachineEvent
     public function isRefresh();
 
     /**
+     * @param string $name
+     * @param mixed $default
+     * @return string
+     */
+    public function getValue($name, $default);
+
+    /**
      * @param SimpleXMLElement $xml
      * @param StateMachine $sm
      * @param StateMachineState $state
