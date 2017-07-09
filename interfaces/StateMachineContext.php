@@ -146,6 +146,11 @@ interface StateMachineContext
     public function getModelPk();
 
     /**
+     * @return bool
+     */
+    public function isModelDeleted();
+
+    /**
      * @param StateMachine $sm
      * @param string $role
      * @param IdentityInterface $user - model of user initiating the context

@@ -71,7 +71,7 @@ class Timeout extends Event implements StateMachineTimeout
     public function register(StateMachineContext $context)
     {
         $dbClass = $context->getSm()->modelTimeout;
-        if ($dbClass && !$context->getModel()->isModelDeleted()) {
+        if ($dbClass && !$context->isModelDeleted()) {
             /** @var SmTimeout $m */
             $m = new $dbClass();
 

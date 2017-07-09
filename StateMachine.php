@@ -215,7 +215,7 @@ class StateMachine extends Component
             }
 
             // Persist the context's model data
-            if (!$context->getModel()->isModelDeleted()) {
+            if (!$context->isModelDeleted()) {
                 $context->getModel()->save();
             }
 

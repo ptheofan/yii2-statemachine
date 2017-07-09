@@ -276,6 +276,19 @@ class Context extends Model implements StateMachineContext
     }
 
     /**
+     * @return bool
+     */
+    public function isModelDeleted()
+    {
+        $model = $this->getModel();
+        $virtAtr = $this->getVirtAttr();
+        /** @var StateMachineBehavior $smBehavior */
+        $smBehavior = $model->{$virtAtr};
+
+        return $smBehavior->isModelDeleted();
+    }
+
+    /**
      * @param StateMachine $sm
      * @param string $role
      * @param IdentityInterface $user - model of user initiating the context

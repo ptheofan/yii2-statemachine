@@ -48,14 +48,21 @@ class SmTimeout extends ActiveRecord
         $modelName = $this->model;
         $model = $modelName::findOne(Json::decode($this->model_pk));
 
-        // If model does not exist or is marked as deleted the drop this
-        // TODO: Delete this timeout
-        if (!$model || $model->isModelDeleted()) {
+        if (!$model) {
+            // Model no longer exists - delete this timeout
+            $this->delete();
             return null;
         }
 
         /** @var StateMachineBehavior $smBehavior */
         $smBehavior = $model->{$this->virtual_attribute};
+
+        if ($smBehavior->isModelDeleted()) {
+            // Model is marked as deleted - no reason to go on
+            $this->delete();
+            return null;
+        }
+
         return $smBehavior->trigger($this->event_name);
     }
 }
