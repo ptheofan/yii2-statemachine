@@ -52,13 +52,35 @@ class StateMachineBehavior extends Behavior
     public $userRoleGetter = 'getUserRole';
 
     /**
+     * @var bool
+     */
+    private $modelDeleted = false;
+
+    /**
+     * @return bool
+     */
+    public function isModelDeleted()
+    {
+        return $this->modelDeleted;
+    }
+
+    /**
      * @return array
      */
     public function events()
     {
         return [
             ActiveRecord::EVENT_AFTER_INSERT => 'initStateMachine',
+            ActiveRecord::EVENT_AFTER_DELETE => 'afterModelDelete',
         ];
+    }
+
+    /**
+     * @param yii\base\Event $event
+     */
+    public function afterModelDelete($event)
+    {
+        $this->modelDeleted = true;
     }
 
     /**

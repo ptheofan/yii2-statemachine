@@ -12,6 +12,17 @@ use yii\db\ActiveRecord;
  * Class SmJournal
  *
  * @package ptheofan\statemachine\dbmodels
+ *
+ * @property int $id
+ * @property string $role
+ * @property string $model
+ * @property string $model_pk
+ * @property string $sm_name
+ * @property string $attr
+ * @property string $from_state
+ * @property string $to_state
+ * @property int $created_at
+ * @property int $created_by
  */
 class SmJournal extends ActiveRecord implements StateMachineJournal
 {

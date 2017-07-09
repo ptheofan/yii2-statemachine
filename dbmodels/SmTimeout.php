@@ -13,6 +13,14 @@ use yii\helpers\Json;
  * Class SmTimeout
  *
  * @package ptheofan\statemachine\dbmodels
+ *
+ * @property int $id
+ * @property string $model
+ * @property string $model_pk
+ * @property string $virtual_attribute
+ * @property string $sm_name
+ * @property string $event_name
+ * @property int $expires_at
  */
 class SmTimeout extends ActiveRecord
 {
@@ -39,6 +47,12 @@ class SmTimeout extends ActiveRecord
         /** @var ActiveRecord $modelName */
         $modelName = $this->model;
         $model = $modelName::findOne(Json::decode($this->model_pk));
+
+        // If model does not exist or is marked as deleted the drop this
+        // TODO: Delete this timeout
+        if (!$model || $model->isModelDeleted()) {
+            return null;
+        }
 
         /** @var StateMachineBehavior $smBehavior */
         $smBehavior = $model->{$this->virtual_attribute};

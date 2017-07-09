@@ -199,7 +199,7 @@ class StateMachine extends Component
 
             // Cleanup old timeouts
             Timeout::cleanUp($context);
-            
+
             // Entering new state...
             $context->getModel()->{$context->getAttr()} = $event->getTarget();
             foreach ($event->getTargetState()->getEnterCommands() as $command) {
@@ -215,7 +215,9 @@ class StateMachine extends Component
             }
 
             // Persist the context's model data
-            $context->getModel()->save();
+            if (!$context->getModel()->isModelDeleted()) {
+                $context->getModel()->save();
+            }
 
             // Update Journal - if applicable
             if ($this->modelJournal) {
@@ -295,7 +297,7 @@ class StateMachine extends Component
         if ($value === null) {
             $value = $this->getInitialStateValue();
         }
-        
+
         if (isset($this->states[$value])) {
             return $this->states[$value];
         }
