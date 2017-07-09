@@ -115,6 +115,19 @@ class StateMachineBehavior extends Behavior
     }
 
     /**
+     * Get the current state
+     * @return State
+     */
+    public function getState()
+    {
+        if (!empty($this->owner->{$this->attr})) {
+            return $this->sm->getState($this->owner->{$this->attr});
+        } else {
+            return $this->sm->getState($this->sm->getInitialStateValue());
+        }
+    }
+
+    /**
      * @param string|StateMachineEvent $event
      * @param string|null|false $role - null means automatically set role, false will explicitly NOT use any role
      * @return StateMachineContext
@@ -154,7 +167,7 @@ class StateMachineBehavior extends Behavior
             $context->attachException($e);
         } finally {
             // Migrate the context errors to the virtual attribute
-            foreach ($context->errors as $attr => $error) {
+            foreach ($context->getErrors() as $attr => $error) {
                 $m->addError($this->virtAttr, $error);
             }
 
@@ -164,7 +177,7 @@ class StateMachineBehavior extends Behavior
 
     /**
      * @param string|null|false $role - null will auto-detect user role, false will get every possible trigger regardless role
-     * @return Event[]
+     * @return StateMachineEvent[]
      * @throws InvalidSchemaException
      * @throws StateNotFoundException
      */

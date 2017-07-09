@@ -172,11 +172,22 @@ class Event extends Object implements StateMachineEvent
     }
 
     /**
+     * @deprecated replaced with getDataValue
      * @param string $name
      * @param mixed $default
      * @return string
      */
     public function getValue($name, $default)
+    {
+        return (array_key_exists($name, $this->data)) ? $this->data[$name] : $default;
+    }
+
+    /**
+     * @param string $name
+     * @param mixed $default
+     * @return string
+     */
+    public function getDataValue($name, $default)
     {
         return (array_key_exists($name, $this->data)) ? $this->data[$name] : $default;
     }

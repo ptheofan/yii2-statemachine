@@ -68,6 +68,11 @@ class State extends Object implements StateMachineState
     protected $exit = [];
 
     /**
+     * @var array
+     */
+    protected $data;
+
+    /**
      * @var Command[]
      */
     private $enterCommands;
@@ -115,6 +120,16 @@ class State extends Object implements StateMachineState
     public function getValue()
     {
         return $this->value;
+    }
+
+    /**
+     * @param string $name
+     * @param mixed $default
+     * @return string
+     */
+    public function getDataValue($name, $default)
+    {
+        return (array_key_exists($name, $this->data)) ? $this->data[$name] : $default;
     }
 
     /**
@@ -252,6 +267,13 @@ class State extends Object implements StateMachineState
         // Value and Label
         $rVal->value = (string)$xml->attributes()->value;
         $rVal->label = (string)$xml->attributes()->label;
+
+        $rVal->data = [];
+        foreach ($xml->attributes() as $k => $v) {
+            if (!in_array($k, ['value', 'label'])) {
+                $rVal->data[$k] = (string)$v;
+            }
+        }
 
         // Load events
         foreach ($xml->event as $eventXml) {
