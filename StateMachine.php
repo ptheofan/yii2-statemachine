@@ -203,9 +203,11 @@ class StateMachine extends Component
             // Entering new state...
             $context->getModel()->{$context->getAttr()} = $event->getTarget();
             foreach ($event->getTargetState()->getEnterCommands() as $command) {
-                if (!$command->execute($context)) {
-                    $txn && $txn->rollBack();
-                    return false;
+                if (!$context->isModelDeleted()) {
+                    if (!$command->execute($context)) {
+                        $txn && $txn->rollBack();
+                        return false;
+                    }
                 }
             }
 
