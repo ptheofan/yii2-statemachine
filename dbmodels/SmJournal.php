@@ -80,14 +80,14 @@ class SmJournal extends ActiveRecord implements StateMachineJournal
     }
 
     /**
-     * @param yii\db\BaseActiveRecord $model
      * @param StateMachineBehavior $stateMachineBehavior
      * @return $this
      */
-    public static function getLastEntryOf($model, $stateMachineBehavior)
+    public static function getLastEntryOf($stateMachineBehavior)
     {
         // TODO: Fix code duplication (this comes from Context)
         // Generate model id
+        $model = $stateMachineBehavior->getOwner();
         $pk = $model->getPrimaryKey(true);
         foreach ($pk as $k => &$v) {
             if (is_object($v)) {
