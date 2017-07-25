@@ -10,6 +10,7 @@ use Exception;
 use ptheofan\statemachine\StateMachine;
 use yii\db\BaseActiveRecord;
 use yii\web\IdentityInterface;
+use yii\web\User;
 
 /**
  * Interface StateMachineContext
@@ -47,7 +48,7 @@ interface StateMachineContext
     public function setRole($role);
 
     /**
-     * @return BaseActiveRecord
+     * @return BaseActiveRecord|User
      */
     public function getUser();
 

@@ -5,6 +5,7 @@ namespace ptheofan\statemachine\dbmodels;
 use ptheofan\statemachine\interfaces\StateMachineContext;
 use ptheofan\statemachine\interfaces\StateMachineEvent;
 use ptheofan\statemachine\interfaces\StateMachineJournal;
+use ptheofan\statemachine\StateMachineBehavior;
 use yii;
 use yii\db\ActiveRecord;
 
@@ -64,7 +65,7 @@ class SmJournal extends ActiveRecord implements StateMachineJournal
         $j->sm_name = $context->getSm()->name;
         $j->attr = $context->getAttr();
         $j->model_pk = $context->getModelPk();
-        
+
         if ($event) {
             $j->from_state = $event->getState()->getValue();
             $j->to_state = $event->getTargetState()->getValue();
@@ -76,5 +77,32 @@ class SmJournal extends ActiveRecord implements StateMachineJournal
         $j->save();
 
         return $j;
+    }
+
+    /**
+     * @param yii\db\BaseActiveRecord $model
+     * @param StateMachineBehavior $stateMachineBehavior
+     * @return $this
+     */
+    public static function getLastEntryOf($model, $stateMachineBehavior)
+    {
+        // TODO: Fix code duplication (this comes from Context)
+        // Generate model id
+        $pk = $model->getPrimaryKey(true);
+        foreach ($pk as $k => &$v) {
+            if (is_object($v)) {
+                $v = (string)$v;
+            }
+        }
+
+        return static::find()
+            ->andWhere([
+                'model_pk' => \yii\helpers\Json::encode($pk),
+                'model' => $model::className(),
+                'attr' => $stateMachineBehavior->attr,
+            ])
+            ->orderBy(['created_at' => SORT_DESC])
+            ->limit(1)
+            ->one();
     }
 }

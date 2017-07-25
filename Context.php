@@ -13,6 +13,7 @@ use yii\base\Model;
 use yii\db\BaseActiveRecord;
 use yii\helpers\Json;
 use yii\web\IdentityInterface;
+use yii\web\User;
 
 /**
  * Class Context
@@ -114,7 +115,7 @@ class Context extends Model implements StateMachineContext
     }
 
     /**
-     * @return BaseActiveRecord
+     * @return BaseActiveRecord|User
      */
     public function getUser()
     {
