@@ -1,4 +1,4 @@
 
 <?php
-defined('VERSION') || define('VERSION', '23.04.2018-33');
+defined('VERSION') || define('VERSION', '23.04.2018-34');
 

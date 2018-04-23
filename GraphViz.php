@@ -100,6 +100,8 @@ class GraphViz extends BaseObject
             foreach ($connectors as $event) {
                 $p = $this->profile['events']['default'];
 
+                // We now have conditional and no conditional events.
+                // TODO: Represent the conditions of the event on the graph
 //                foreach ($this->profile['events']['exclusiveRoles'] as $exclusiveRole => $roleProfile) {
 //                    if ($event->isExclusiveTo($exclusiveRole)) {
 //                        $p = array_merge($p, $roleProfile);
