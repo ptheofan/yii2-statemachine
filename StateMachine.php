@@ -192,21 +192,14 @@ class StateMachine extends Component
             // Entering new state...
             $context->getModel()->{$context->getAttr()} = $event->getTarget();
             foreach ($event->getTargetState()->getEnterCommands() as $command) {
-                if (!$context->isModelDeleted()) {
-                    if (!$command->execute($context)) {
-                        return false;
-                    }
+                if (!$command->execute($context)) {
+                    return false;
                 }
             }
 
             // Register the new timeouts
             foreach ($event->getTargetState()->getTimeOuts() as $timeout) {
                 $timeout->register($context);
-            }
-
-            // Persist the context's model data
-            if (!$context->isModelDeleted()) {
-                $context->getModel()->save();
             }
 
             // Update Journal - if applicable

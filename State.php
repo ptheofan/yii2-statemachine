@@ -174,16 +174,16 @@ class State extends BaseObject implements StateMachineState
 
     /**
      * @param string $label
-     * @param string|null $role
+     * @param StateMachineContext $context
      * @return StateMachineEvent|null
      */
-    public function getEventByLabel($label, $role = null)
+    public function getEventByLabel($label, $context)
     {
         $events = array_merge($this->getEvents(), $this->getTimeOuts());
         /** @var StateMachineEvent $event */
         foreach ($events as $event) {
             if ($event->getLabel() === $label) {
-                if ($event->isRoleValid($role)) {
+                if ($event->isValid($context)) {
                     return $event;
                 }
             }

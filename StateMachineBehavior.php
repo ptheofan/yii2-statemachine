@@ -45,6 +45,11 @@ class StateMachineBehavior extends Behavior
     public $sm;
 
     /**
+     * @var bool
+     */
+    private $modelDeleted = false;
+
+    /**
      * @return array
      */
     public function events()
@@ -53,6 +58,22 @@ class StateMachineBehavior extends Behavior
             ActiveRecord::EVENT_AFTER_INSERT => 'initStateMachine',
             ActiveRecord::EVENT_AFTER_DELETE => 'afterModelDelete',
         ];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isModelDeleted()
+    {
+        return $this->modelDeleted;
+    }
+
+    /**
+     * @param $evt
+     */
+    public function afterModelDelete($evt)
+    {
+        $this->modelDeleted = true;
     }
 
     /**

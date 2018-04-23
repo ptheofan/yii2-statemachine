@@ -42,6 +42,11 @@ interface StateMachineContext
     public function getIdentity();
 
     /**
+     * @return bool
+     */
+    public function isModelDeleted();
+
+    /**
      * @return BaseActiveRecord
      */
     public function getModel();
@@ -116,11 +121,6 @@ interface StateMachineContext
      * @return string
      */
     public function getModelPk();
-
-    /**
-     * @return bool
-     */
-    public function isModelDeleted();
 
     /**
      * @param StateMachine $sm

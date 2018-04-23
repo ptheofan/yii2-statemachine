@@ -102,6 +102,14 @@ class Context extends Model implements StateMachineContext
     }
 
     /**
+     * @return bool
+     */
+    public function isModelDeleted()
+    {
+        return $this->model->{$this->virtAttr}->isModelDeleted();
+    }
+
+    /**
      * @return BaseActiveRecord
      */
     public function getModel()
@@ -223,19 +231,6 @@ class Context extends Model implements StateMachineContext
             }
         }
         return Json::encode($pk);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isModelDeleted()
-    {
-        $model = $this->getModel();
-        $virtAtr = $this->getVirtAttr();
-        /** @var StateMachineBehavior $smBehavior */
-        $smBehavior = $model->{$virtAtr};
-
-        return $smBehavior->isModelDeleted();
     }
 
     /**

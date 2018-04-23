@@ -62,10 +62,10 @@ interface StateMachineState
 
     /**
      * @param string $label
-     * @param string|null $role
+     * @param StateMachineContext $context
      * @return StateMachineEvent|null
      */
-    public function getEventByLabel($label, $role = null);
+    public function getEventByLabel($label, $context);
 
     /**
      * @return Command[]
