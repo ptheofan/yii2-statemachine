@@ -4,21 +4,20 @@
  * Date: 05/06/16
  * Time: 01:10
  */
-namespace ptheofan\statemachine\conditions;
+namespace ptheofan\statemachine;
 
 use ptheofan\statemachine\exceptions\InvalidSchemaException;
 use ptheofan\statemachine\interfaces\StateMachineContext;
-use ptheofan\statemachine\StateMachine;
 use SimpleXMLElement;
 use yii;
-use yii\base\Object;
+use yii\base\BaseObject;
 
 /**
  * Class Condition
  *
  * @package ptheofan\statemachine\commands
  */
-abstract class Condition extends Object
+abstract class Condition extends BaseObject
 {
     /**
      * @var StateMachine
@@ -30,10 +29,11 @@ abstract class Condition extends Object
      * @param StateMachineContext $context
      * @return bool
      */
-    public abstract function check(StateMachineContext $context);
+    public abstract function isValid(StateMachineContext $context);
 
     /**
      * @return string
+     * @throws \ReflectionException
      */
     public function shortName()
     {
@@ -60,8 +60,9 @@ abstract class Condition extends Object
             $config[(string)$child->getName()][] = (string)$child;
         }
 
+        // If no class is defined use the node name as class
         if (!isset($config['class'])) {
-            throw new InvalidSchemaException("All conditions must have a class attribute");
+            $config['class'] = ucfirst((string)$child->getName());
         }
 
         // If no namespace is defined, use the $sm default commands namespace
@@ -71,7 +72,7 @@ abstract class Condition extends Object
 
         $command = Yii::createObject($config);
         if (!($command instanceof Condition)) {
-            throw new InvalidSchemaException("All state machine conditions must derive from ptheofan\\statemachine\\conditions\\Condition");
+            throw new InvalidSchemaException("All state machine conditions must derive from ptheofan\\statemachine\\Condition");
         }
 
         $command->sm = $sm;

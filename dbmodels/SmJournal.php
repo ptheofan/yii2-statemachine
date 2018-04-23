@@ -56,7 +56,7 @@ class SmJournal extends ActiveRecord implements StateMachineJournal
         $j = new static();
         $m = $context->getModel();
         $j->role = $context->getRole();
-        $user = $context->getUser();
+        $user = $context->getIdentity();
         if ($user) {
             $j->created_by = $user->getId();
         }
@@ -87,7 +87,7 @@ class SmJournal extends ActiveRecord implements StateMachineJournal
     {
         // TODO: Fix code duplication (this comes from Context)
         // Generate model id
-        $model = $stateMachineBehavior->getOwner();
+        $model = $stateMachineBehavior->owner;
         $pk = $model->getPrimaryKey(true);
         foreach ($pk as $k => &$v) {
             if (is_object($v)) {

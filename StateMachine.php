@@ -62,13 +62,6 @@ class StateMachine extends Component
     public $event = 'Event';
 
     /**
-     * Enable or Disable the internal use of transactions. This is handy when you work with databases
-     * that don't support transactions (ie. MongoDB).
-     * @var bool
-     */
-    public $useTransactions = true;
-
-    /**
      * The schema of the StateMachine that describes the states, events, etc.
      * This can be
      *      string - xml
@@ -185,14 +178,10 @@ class StateMachine extends Component
         // Let the context know which event triggered the transition
         $context->setEvent($event);
 
-        /** @var yii\db\Transaction|false $txn */
-        $txn = $this->useTransactions ? $context->getModel()->getDb()->beginTransaction() : false;
-
         try {
             // Leaving current state...
             foreach ($event->getState()->getExitCommands() as $command) {
                 if (!$command->execute($context)) {
-                    $txn && $txn->rollBack();
                     return false;
                 }
             }
@@ -205,7 +194,6 @@ class StateMachine extends Component
             foreach ($event->getTargetState()->getEnterCommands() as $command) {
                 if (!$context->isModelDeleted()) {
                     if (!$command->execute($context)) {
-                        $txn && $txn->rollBack();
                         return false;
                     }
                 }
@@ -228,12 +216,9 @@ class StateMachine extends Component
                 $journal::nu($context, $event);
             }
 
-            $txn && $txn->commit();
-
             // transition completed successfully
             return true;
         } catch (Exception $e) {
-            $txn && $txn->rollBack();
             $context->attachException($e);
             throw $e;
         }

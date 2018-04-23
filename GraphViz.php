@@ -8,9 +8,9 @@ namespace ptheofan\statemachine;
 
 use Alom\Graphviz\Digraph;
 use ptheofan\statemachine\interfaces\StateMachineState;
-use yii\base\Object;
+use yii\base\BaseObject;
 
-class GraphViz extends Object
+class GraphViz extends BaseObject
 {
     /**
      * @var array
@@ -100,12 +100,12 @@ class GraphViz extends Object
             foreach ($connectors as $event) {
                 $p = $this->profile['events']['default'];
 
-                foreach ($this->profile['events']['exclusiveRoles'] as $exclusiveRole => $roleProfile) {
-                    if ($event->isExclusiveTo($exclusiveRole)) {
-                        $p = array_merge($p, $roleProfile);
-                        break;
-                    }
-                }
+//                foreach ($this->profile['events']['exclusiveRoles'] as $exclusiveRole => $roleProfile) {
+//                    if ($event->isExclusiveTo($exclusiveRole)) {
+//                        $p = array_merge($p, $roleProfile);
+//                        break;
+//                    }
+//                }
 
                 if ($event instanceof Timeout) {
                     $p = array_merge($p, $this->profile['events']['timeout']);

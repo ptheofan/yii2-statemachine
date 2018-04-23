@@ -11,14 +11,14 @@ use ptheofan\statemachine\interfaces\StateMachineContext;
 use ptheofan\statemachine\StateMachine;
 use SimpleXMLElement;
 use yii;
-use yii\base\Object;
+use yii\base\BaseObject;
 
 /**
  * Class Command
  *
  * @package ptheofan\statemachine\commands
  */
-abstract class Command extends Object
+abstract class Command extends BaseObject
 {
     /**
      * @var StateMachine
@@ -34,6 +34,7 @@ abstract class Command extends Object
 
     /**
      * @return string
+     * @throws \ReflectionException
      */
     public function shortName()
     {
@@ -60,8 +61,9 @@ abstract class Command extends Object
             $config[(string)$child->getName()][] = (string)$child;
         }
 
+        // If no class is defined use the node name as class
         if (!isset($config['class'])) {
-            throw new InvalidSchemaException("All commands must have a class attribute");
+            $config['class'] = ucfirst((string)$child->getName());
         }
 
         // If no namespace is defined, use the $sm default commands namespace
