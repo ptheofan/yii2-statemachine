@@ -163,9 +163,10 @@ class Event extends BaseObject implements StateMachineEvent
             }
         }
 
-        $conditions = !empty($xml->conditions) ? $xml->conditions[0]->condition : [];
-        foreach ($conditions as $condition) {
-            $rVal->conditions[] = Condition::fromXml($condition, $sm);
+        if (!empty($xml->conditions)) {
+            foreach ($xml->conditions as $condition) {
+                $rVal->conditions[] = Condition::fromXml($condition, $sm);
+            }
         }
 
         return $rVal;
