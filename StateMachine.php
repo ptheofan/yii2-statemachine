@@ -191,6 +191,10 @@ class StateMachine extends Component
 
             // Entering new state...
             $context->getModel()->{$context->getAttr()} = $event->getTarget();
+            if ($context->getModel()->hasMethod('save')) {
+                $context->getModel()->save(false, [$context->getAttr()]);
+            }
+
             foreach ($event->getTargetState()->getEnterCommands() as $command) {
                 if (!$command->execute($context)) {
                     return false;
