@@ -4,7 +4,7 @@
  * Date: 05/06/16
  * Time: 01:10
  */
-namespace ptheofan\statemachine\commands;
+namespace ptheofan\statemachine\conditions;
 
 use ptheofan\statemachine\exceptions\InvalidSchemaException;
 use ptheofan\statemachine\interfaces\StateMachineContext;
@@ -14,11 +14,11 @@ use yii;
 use yii\base\Object;
 
 /**
- * Class Command
+ * Class Condition
  *
  * @package ptheofan\statemachine\commands
  */
-abstract class Command extends Object
+abstract class Condition extends Object
 {
     /**
      * @var StateMachine
@@ -30,7 +30,7 @@ abstract class Command extends Object
      * @param StateMachineContext $context
      * @return bool
      */
-    public abstract function execute(StateMachineContext $context);
+    public abstract function check(StateMachineContext $context);
 
     /**
      * @return string
@@ -44,7 +44,7 @@ abstract class Command extends Object
     /**
      * @param SimpleXMLElement $xml
      * @param StateMachine $sm
-     * @return Command
+     * @return Condition
      * @throws InvalidSchemaException
      * @throws \yii\base\InvalidConfigException
      */
@@ -61,17 +61,17 @@ abstract class Command extends Object
         }
 
         if (!isset($config['class'])) {
-            throw new InvalidSchemaException("All commands must have a class attribute");
+            throw new InvalidSchemaException("All conditions must have a class attribute");
         }
 
         // If no namespace is defined, use the $sm default commands namespace
         if (strpos($config['class'], '\\') === false) {
-            $config['class'] = $sm->commandsNamespace . '\\' . $config['class'];
+            $config['class'] = $sm->conditionsNamespace . '\\' . $config['class'];
         }
 
         $command = Yii::createObject($config);
-        if (!($command instanceof Command)) {
-            throw new InvalidSchemaException("All state machine commands must derive from ptheofan\\statemachine\\commands\\Command");
+        if (!($command instanceof Condition)) {
+            throw new InvalidSchemaException("All state machine conditions must derive from ptheofan\\statemachine\\conditions\\Condition");
         }
 
         $command->sm = $sm;

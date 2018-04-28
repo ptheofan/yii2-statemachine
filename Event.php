@@ -6,18 +6,19 @@
  */
 namespace ptheofan\statemachine;
 
+use ptheofan\statemachine\conditions\Condition;
 use ptheofan\statemachine\interfaces\StateMachineContext;
 use ptheofan\statemachine\interfaces\StateMachineEvent;
 use ptheofan\statemachine\interfaces\StateMachineState;
 use SimpleXMLElement;
-use yii\base\BaseObject;
+use yii\base\Object;
 
 /**
  * Class Event
  *
  * @package ptheofan\statemachine
  */
-class Event extends BaseObject implements StateMachineEvent
+class Event extends Object implements StateMachineEvent
 {
     /**
      * @var string
@@ -73,7 +74,6 @@ class Event extends BaseObject implements StateMachineEvent
     /**
      * @return State
      * @throws exceptions\InvalidSchemaException
-     * @throws exceptions\StateMachineNotFoundException
      * @throws exceptions\StateNotFoundException
      */
     public function getTargetState()
@@ -90,18 +90,77 @@ class Event extends BaseObject implements StateMachineEvent
     }
 
     /**
-     * @param StateMachineContext $context
+     * @return array
+     */
+    public function getRoles()
+    {
+        return $this->roles;
+    }
+
+    /**
+     * @param string $role
      * @return bool
      */
-    public function isValid(StateMachineContext $context)
+    public function hasRole($role)
     {
-        foreach ($this->conditions as $condition) {
-            if (!$condition->isValid($context)) {
+        return in_array($role, $this->roles);
+    }
+
+    /**
+     * @param string $role
+     * @return bool
+     */
+    public function isRoleValid($role)
+    {
+        if (!$role || empty($this->roles)) {
+            return true;
+        }
+
+        return in_array($role, $this->roles);
+    }
+
+    /**
+     * Test if the event can be triggered by ALL of $roles
+     *
+     * @param array|string $roles
+     * @param StateMachineContext|null $context
+     * @return bool
+     */
+    public function isEligible($roles, $context = null)
+    {
+        if (!is_array($roles)) {
+            if (!in_array($roles, $this->roles)) {
+                return false;
+            }
+        } else {
+            if (array_diff($roles, $this->roles) !== []) {
                 return false;
             }
         }
 
+        if ($context) {
+            foreach ($this->conditions as $condition) {
+                if (!$condition->check($context)) {
+                    return false;
+                }
+            }
+        }
+
         return true;
+    }
+
+    /**
+     * Will return true if ONLY the $roles can trigger this event
+     * @param array|string $roles
+     * @return bool
+     */
+    public function isExclusiveTo($roles)
+    {
+        if (!is_array($roles)) {
+            return $this->roles === [$roles];
+        } else {
+            return array_diff($this->roles, $roles) === [];
+        }
     }
 
     /**
@@ -138,8 +197,6 @@ class Event extends BaseObject implements StateMachineEvent
      * @param StateMachine $sm
      * @param StateMachineState $state
      * @return static
-     * @throws \yii\base\InvalidConfigException
-     * @throws exceptions\InvalidSchemaException
      */
     public static function fromXml(SimpleXMLElement $xml, StateMachine $sm, StateMachineState $state)
     {
@@ -163,10 +220,9 @@ class Event extends BaseObject implements StateMachineEvent
             }
         }
 
-        if (!empty($xml->conditions)) {
-            foreach ($xml->conditions as $condition) {
-                $rVal->conditions[] = Condition::fromXml($condition, $sm);
-            }
+        $conditions = !empty($xml->conditions) ? $xml->conditions[0]->condition : [];
+        foreach ($conditions as $condition) {
+            $rVal->conditions[] = Condition::fromXml($condition, $sm);
         }
 
         return $rVal;

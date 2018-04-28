@@ -13,9 +13,9 @@ use ptheofan\statemachine\interfaces\StateMachineEvent;
 use ptheofan\statemachine\interfaces\StateMachineState;
 use ptheofan\statemachine\interfaces\StateMachineTimeout;
 use SimpleXMLElement;
-use yii\base\BaseObject;
+use yii\base\Object;
 
-class State extends BaseObject implements StateMachineState
+class State extends Object implements StateMachineState
 {
     /**
      * @var StateMachine
@@ -133,17 +133,18 @@ class State extends BaseObject implements StateMachineState
     }
 
     /**
+     * @param string|null $role
      * @param StateMachineContext|null $context
      * @return interfaces\StateMachineEvent[]
      */
-    public function getEvents($context = null)
+    public function getEvents($role = null, $context = null)
     {
-        if ($context === null) {
+        if ($role === null) {
             return $this->events;
         } else {
-            return array_filter($this->events, function($e) use ($context) {
+            return array_filter($this->events, function($e) use ($role, $context) {
                 /** @var StateMachineEvent $e */
-                return $e->isValid($context);
+                return $e->isEligible($role, $context);
             });
         }
     }
@@ -174,16 +175,16 @@ class State extends BaseObject implements StateMachineState
 
     /**
      * @param string $label
-     * @param StateMachineContext $context
+     * @param string|null $role
      * @return StateMachineEvent|null
      */
-    public function getEventByLabel($label, $context)
+    public function getEventByLabel($label, $role = null)
     {
         $events = array_merge($this->getEvents(), $this->getTimeOuts());
         /** @var StateMachineEvent $event */
         foreach ($events as $event) {
             if ($event->getLabel() === $label) {
-                if ($event->isValid($context)) {
+                if ($event->isRoleValid($role)) {
                     return $event;
                 }
             }
@@ -220,16 +221,16 @@ class State extends BaseObject implements StateMachineState
 
     /**
      * @param string $target
-     * @param StateMachineContext $context
+     * @param string $role
      * @return StateMachineEvent
      * @throws CannotGuessEventException
      */
-    public function guessEvent($target, $context = null)
+    public function guessEvent($target, $role)
     {
         $events = $this->getEventsTargeting($target);
         $candidates = [];
         foreach ($events as $event) {
-            if ($event->isValid($context)) {
+            if ($event->isRoleValid($role)) {
                 $candidates[] = $event;
             }
         }

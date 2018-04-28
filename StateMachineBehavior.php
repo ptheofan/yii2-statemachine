@@ -10,6 +10,7 @@ use ptheofan\statemachine\exceptions\CannotGuessEventException;
 use ptheofan\statemachine\exceptions\EventNotFoundException;
 use ptheofan\statemachine\exceptions\InvalidSchemaException;
 use ptheofan\statemachine\exceptions\StateNotFoundException;
+use ptheofan\statemachine\exceptions\TransitionException;
 use ptheofan\statemachine\interfaces\StateMachineContext;
 use ptheofan\statemachine\interfaces\StateMachineEvent;
 use yii;
@@ -45,11 +46,6 @@ class StateMachineBehavior extends Behavior
     public $sm;
 
     /**
-     * @var bool
-     */
-    private $modelDeleted = false;
-
-    /**
      * @return array
      */
     public function events()
@@ -58,22 +54,6 @@ class StateMachineBehavior extends Behavior
             ActiveRecord::EVENT_AFTER_INSERT => 'initStateMachine',
             ActiveRecord::EVENT_AFTER_DELETE => 'afterModelDelete',
         ];
-    }
-
-    /**
-     * @return bool
-     */
-    public function isModelDeleted()
-    {
-        return $this->modelDeleted;
-    }
-
-    /**
-     * @param $evt
-     */
-    public function afterModelDelete($evt)
-    {
-        $this->modelDeleted = true;
     }
 
     /**
@@ -97,23 +77,23 @@ class StateMachineBehavior extends Behavior
     }
 
     /**
-     * @param yii\web\IdentityInterface|null $identity
+     * @param array|null $roles
      * @return StateMachineContext
-     * @throws \Throwable
      */
-    public function createContext($identity = null)
+    public function createContext($roles = null)
     {
         $m = $this->owner;
-        return Context::nu($this->sm, $identity, $m, $this->attr, $this->virtAttr);
+        $identity = Yii::$app->user->getIdentity(false);
+        if (is_string($roles)) {
+            $roles = [$roles];
+        }
+
+        return Context::nu($this->sm, $roles, $identity, $m, $this->attr, $this->virtAttr);
     }
 
     /**
      * Get the current state
-     *
      * @return State
-     * @throws InvalidSchemaException
-     * @throws StateNotFoundException
-     * @throws exceptions\StateMachineNotFoundException
      */
     public function getState()
     {
@@ -126,70 +106,66 @@ class StateMachineBehavior extends Behavior
 
     /**
      * @param string|StateMachineEvent $event
-     * @param yii\web\IdentityInterface|StateMachineContext|null $identity
+     * @param Context|null $context
      * @return StateMachineContext
      * @throws EventNotFoundException
      * @throws InvalidSchemaException
      * @throws StateNotFoundException
      * @throws \Exception
-     * @throws \Throwable
      */
-    public function trigger($event, $identity = null)
+    public function trigger($event, $context = null)
     {
         $m = $this->owner;
 
         // State
         $state = $this->sm->getState($m->{$this->attr});
 
-        // Acquire context if applicable
-        if ($identity instanceof StateMachineContext) {
-            $context = $identity;
-            $identity = $context->getIdentity();
-        } else {
-            $context = $this->createContext($identity);
-        }
-
         // Event
-        if (!$event instanceof StateMachineEvent) {
-            $evt = $state->getEventByLabel($event, $context);
+        if (is_string($event)) {
+            $evt = $state->getEventByLabel($event, $role);
             if (!$evt) {
-                throw new EventNotFoundException("No valid event `{$event}`".($context ? ' (with context)' : null)." found in State Machine `{$this->sm->name}`");
+                throw new EventNotFoundException("Event `{$event}` for Role `{$role}` not found in State Machine `{$this->sm->name}`");
             }
 
             $event = $evt;
+        }
+
+        // Context
+        if (!$context) {
+            $context = $this->createContext($role);
         }
 
         try {
             $this->sm->transition($event, $context);
         } catch (Exception $e) {
             $context->attachException($e);
-        }
-
-        if ($context->hasErrors()) {
+        } finally {
             // Migrate the context errors to the virtual attribute
             foreach ($context->getErrors() as $attr => $error) {
                 $m->addError($this->virtAttr, $error);
             }
-        }
 
-        return $context;
+            return $context;
+        }
     }
 
     /**
-     * @param yii\web\IdentityInterface $identity
+     * @param string|null|false $role - null will auto-detect user role, false will get every possible trigger regardless role
      * @return StateMachineEvent[]
-     * @throws \Throwable
+     * @throws InvalidSchemaException
+     * @throws StateNotFoundException
      */
-    public function getTriggers($identity = null)
+    public function getTriggers($role = null)
     {
-        $context = $this->createContext($identity);
+        $context = $this->createContext($role);
         return $context->getPossibleEvents();
     }
 
     /**
-     * @return StateMachineContext
-     * @throws \Throwable
-     * @throws yii\db\Exception
+     * @throws InvalidSchemaException
+     * @throws TransitionException
+     * @throws \yii\db\Exception
+     * @throws exceptions\StateNotFoundException
      */
     public function initStateMachine()
     {
@@ -216,11 +192,10 @@ class StateMachineBehavior extends Behavior
      * @throws CannotGuessEventException
      * @throws EventNotFoundException
      * @throws InvalidSchemaException
-     * @throws StateNotFoundException
-     * @throws \Throwable
-     * @throws exceptions\StateMachineNotFoundException
-     * @throws yii\base\UnknownPropertyException
-     * @throws yii\db\Exception
+     * @throws TransitionException
+     * @throws \yii\base\UnknownPropertyException
+     * @throws exceptions\StateNotFoundException
+     * @throws null
      */
     public function __set($name, $value)
     {
@@ -246,9 +221,8 @@ class StateMachineBehavior extends Behavior
                     throw new InvalidSchemaException("Cannot load current state {$m->{$this->attr}}");
                 }
 
-                $ctx = $this->createContext();
-                $event = $state->guessEvent($value, $ctx);
-                $context = $this->trigger($event, $ctx);
+                $event = $state->guessEvent($value, $this->internalGetUserRole(Yii::$app->user->identity));
+                $context = $this->trigger($event);
             }
 
             // Migrate the context errors to the virtual attribute
@@ -263,7 +237,6 @@ class StateMachineBehavior extends Behavior
     /**
      * @param string $name
      * @return mixed
-     * @throws yii\base\UnknownPropertyException
      */
     public function __get($name)
     {

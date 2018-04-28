@@ -6,7 +6,6 @@
  */
 namespace ptheofan\statemachine\conditions;
 
-use ptheofan\statemachine\Condition;
 use ptheofan\statemachine\interfaces\StateMachineContext;
 
 /**
@@ -50,7 +49,7 @@ class AttributeCheck extends Condition
      * @param StateMachineContext $context
      * @return bool
      */
-    public function isValid(StateMachineContext $context)
+    public function check(StateMachineContext $context)
     {
         $value = $context->getModel()->{$this->getter};
         if ($this->strictMode) {

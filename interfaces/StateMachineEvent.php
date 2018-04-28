@@ -42,10 +42,37 @@ interface StateMachineEvent
     public function getState();
 
     /**
-     * @param StateMachineContext $context
+     * @return array
+     */
+    public function getRoles();
+
+    /**
+     * @param string $role
      * @return bool
      */
-    public function isValid(StateMachineContext $context);
+    public function hasRole($role);
+
+    /**
+     * @param string $role
+     * @return bool
+     */
+    public function isRoleValid($role);
+
+    /**
+     * Test if the event can be triggered by ALL of $roles
+     *
+     * @param array|string $roles
+     * @param StateMachineContext|null $context
+     * @return bool
+     */
+    public function isEligible($roles, $context);
+
+    /**
+     * Will return true if ONLY the $roles can trigger this event
+     * @param array|string $roles
+     * @return bool
+     */
+    public function isExclusiveTo($roles);
 
     /**
      * @return bool

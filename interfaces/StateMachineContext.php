@@ -37,19 +37,37 @@ interface StateMachineContext
     public function getEvent();
 
     /**
-     * @return IdentityInterface|User
+     * @return string
      */
-    public function getIdentity();
+    public function getRole();
 
     /**
-     * @return bool
+     * @param string $role
+     * @return $this
      */
-    public function isModelDeleted();
+    public function setRole($role);
+
+    /**
+     * @return BaseActiveRecord|User
+     */
+    public function getUser();
+
+    /**
+     * @param BaseActiveRecord $user
+     * @return $this
+     */
+    public function setUser($user);
 
     /**
      * @return BaseActiveRecord
      */
     public function getModel();
+
+    /**
+     * @param BaseActiveRecord $model
+     * @return $this
+     */
+    public function setModel($model);
 
     /**
      * @return string
@@ -60,6 +78,12 @@ interface StateMachineContext
      * @return StateMachine
      */
     public function getSm();
+
+    /**
+     * @param StateMachine $sm
+     * @return $this
+     */
+    public function setSm($sm);
 
     /**
      * @return string
@@ -123,12 +147,18 @@ interface StateMachineContext
     public function getModelPk();
 
     /**
+     * @return bool
+     */
+    public function isModelDeleted();
+
+    /**
      * @param StateMachine $sm
+     * @param string $role
      * @param IdentityInterface $user - model of user initiating the context
      * @param BaseActiveRecord $model - model that holds the attribute controlled by the state machine
      * @param string $attr
      * @param string $virtAttr
      * @return static
      */
-    public static function nu($sm, $user, $model, $attr, $virtAttr);
+    public static function nu($sm, $role, $user, $model, $attr, $virtAttr);
 }
