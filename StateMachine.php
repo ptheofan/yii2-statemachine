@@ -191,6 +191,10 @@ class StateMachine extends Component
 
             // Entering new state...
             $context->getModel()->{$context->getAttr()} = $event->getTarget();
+            if ($context->getModel()->hasMethod('save')) {
+                $context->getModel()->save(false, [$context->getAttr()]);
+            }
+
             foreach ($event->getTargetState()->getEnterCommands() as $command) {
                 if (!$context->isModelDeleted()) {
                     if (!$command->execute($context)) {
@@ -202,11 +206,6 @@ class StateMachine extends Component
             // Register the new timeouts
             foreach ($event->getTargetState()->getTimeOuts() as $timeout) {
                 $timeout->register($context);
-            }
-
-            // Persist the context's model data
-            if (!$context->isModelDeleted()) {
-                $context->getModel()->save();
             }
 
             // Update Journal - if applicable
@@ -233,26 +232,25 @@ class StateMachine extends Component
      */
     public function initStateMachineAttribute(StateMachineContext $context)
     {
-        /** @var yii\db\Transaction|false $txn */
-        $txn = $this->useTransactions ? $context->getModel()->getDb()->beginTransaction() : false;
         try {
-            // Entering state...
-            $context->getModel()->{$context->getAttr()} = $this->getInitialStateValue();
+            // Entering new state...
+            $context->getModel()->{$context->getAttr()} = $event->getTarget();
             $state = $this->getState($this->getInitialStateValue());
             foreach ($state->getEnterCommands() as $command) {
                 if (!$command->execute($context)) {
-                    $txn && $txn->rollBack();
                     return false;
                 }
+            }
+
+            // Persist model data if possible
+            if ($context->getModel()->hasMethod('save')) {
+                $context->getModel()->save(false, [$context->getAttr()]);
             }
 
             // Register the new timeouts
             foreach ($state->getTimeOuts() as $timeout) {
                 $timeout->register($context);
             }
-
-            // Persist the context's model data
-            $context->getModel()->save();
 
             // Update Journal - if applicable
             if ($this->modelJournal) {
@@ -261,12 +259,9 @@ class StateMachine extends Component
                 $journal::nu($context, null);
             }
 
-            $txn && $txn->commit();
-
             // transition completed successfully
             return true;
         } catch (Exception $e) {
-            $txn && $txn->rollBack();
             $context->attachException($e);
             throw $e;
         }
