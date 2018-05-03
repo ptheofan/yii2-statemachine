@@ -196,10 +196,8 @@ class StateMachine extends Component
             }
 
             foreach ($event->getTargetState()->getEnterCommands() as $command) {
-                if (!$context->isModelDeleted()) {
-                    if (!$command->execute($context)) {
-                        return false;
-                    }
+                if (!$command->execute($context)) {
+                    return false;
                 }
             }
 
@@ -232,9 +230,10 @@ class StateMachine extends Component
      */
     public function initStateMachineAttribute(StateMachineContext $context)
     {
+        /** @var yii\db\Transaction|false $txn */
         try {
-            // Entering new state...
-            $context->getModel()->{$context->getAttr()} = $event->getTarget();
+            // Entering state...
+            $context->getModel()->{$context->getAttr()} = $this->getInitialStateValue();
             $state = $this->getState($this->getInitialStateValue());
             foreach ($state->getEnterCommands() as $command) {
                 if (!$command->execute($context)) {
@@ -242,14 +241,14 @@ class StateMachine extends Component
                 }
             }
 
-            // Persist model data if possible
-            if ($context->getModel()->hasMethod('save')) {
-                $context->getModel()->save(false, [$context->getAttr()]);
-            }
-
             // Register the new timeouts
             foreach ($state->getTimeOuts() as $timeout) {
                 $timeout->register($context);
+            }
+
+            // Persist the context's model data
+            if ($context->getModel()->hasMethod('save')) {
+                $context->getModel()->save(false, [$context->getAttr()]);
             }
 
             // Update Journal - if applicable

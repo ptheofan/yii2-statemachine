@@ -20,7 +20,6 @@ class m160703_001232_initStateMachineMigrations extends Migration
 
         $this->createTable('sm_journal', [
             'id' => 'int(11) unsigned NOT NULL AUTO_INCREMENT',
-            'role' => 'varchar(25) DEFAULT NULL',
             'model' => 'varchar(255) DEFAULT NULL',
             'model_pk' => 'varchar(60) DEFAULT NULL',
             'sm_name' => 'varchar(128) DEFAULT NULL',

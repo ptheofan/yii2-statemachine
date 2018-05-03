@@ -220,16 +220,16 @@ class State extends BaseObject implements StateMachineState
 
     /**
      * @param string $target
-     * @param string $role
+     * @param StateMachineContext $context
      * @return StateMachineEvent
      * @throws CannotGuessEventException
      */
-    public function guessEvent($target, $role)
+    public function guessEvent($target, $context = null)
     {
         $events = $this->getEventsTargeting($target);
         $candidates = [];
         foreach ($events as $event) {
-            if ($event->isRoleValid($role)) {
+            if ($event->isValid($context)) {
                 $candidates[] = $event;
             }
         }

@@ -15,7 +15,6 @@ use yii\db\ActiveRecord;
  * @package ptheofan\statemachine\dbmodels
  *
  * @property int $id
- * @property string $role
  * @property string $model
  * @property string $model_pk
  * @property string $sm_name
@@ -55,7 +54,6 @@ class SmJournal extends ActiveRecord implements StateMachineJournal
     {
         $j = new static();
         $m = $context->getModel();
-        $j->role = $context->getIdentity() ? $context->getIdentity()->getId() : null;
         $user = $context->getIdentity();
         if ($user) {
             $j->created_by = $user->getId();

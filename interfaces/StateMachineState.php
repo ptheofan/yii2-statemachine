@@ -44,10 +44,10 @@ interface StateMachineState
     public function getValue();
 
     /**
-     * @param string|null $role
-     * @return StateMachineEvent[]
+     * @param StateMachineContext|null $context
+     * @return interfaces\StateMachineEvent[]
      */
-    public function getEvents($role = null);
+    public function getEvents($context = null);
 
     /**
      * @return StateMachineTimeout[]
@@ -79,11 +79,11 @@ interface StateMachineState
 
     /**
      * @param string $target
-     * @param string $role
+     * @param StateMachineContext $context
      * @return StateMachineEvent
      * @throws CannotGuessEventException
      */
-    public function guessEvent($target, $role);
+    public function guessEvent($target, $context = null);
 
     /**
      * @return string
