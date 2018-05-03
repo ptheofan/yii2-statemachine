@@ -55,8 +55,8 @@ class SmJournal extends ActiveRecord implements StateMachineJournal
     {
         $j = new static();
         $m = $context->getModel();
-        $j->role = $context->getRole();
-        $user = $context->getUser();
+        $j->role = $context->getIdentity() ? $context->getIdentity()->getId() : null;
+        $user = $context->getIdentity();
         if ($user) {
             $j->created_by = $user->getId();
         }

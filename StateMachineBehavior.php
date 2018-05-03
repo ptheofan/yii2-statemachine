@@ -126,7 +126,7 @@ class StateMachineBehavior extends Behavior
 
     /**
      * @param string|StateMachineEvent $event
-     * @param yii\web\IdentityInterface|StateMachineContext|null $identity
+     * @param yii\web\IdentityInterface|null $identity
      * @return StateMachineContext
      * @throws EventNotFoundException
      * @throws InvalidSchemaException
@@ -141,13 +141,8 @@ class StateMachineBehavior extends Behavior
         // State
         $state = $this->sm->getState($m->{$this->attr});
 
-        // Acquire context if applicable
-        if ($identity instanceof StateMachineContext) {
-            $context = $identity;
-            $identity = $context->getIdentity();
-        } else {
-            $context = $this->createContext($identity);
-        }
+        // Context
+        $context = $this->createContext($identity);
 
         // Event
         if (!$event instanceof StateMachineEvent) {
@@ -246,9 +241,8 @@ class StateMachineBehavior extends Behavior
                     throw new InvalidSchemaException("Cannot load current state {$m->{$this->attr}}");
                 }
 
-                $ctx = $this->createContext();
-                $event = $state->guessEvent($value, $ctx);
-                $context = $this->trigger($event, $ctx);
+                $event = $state->guessEvent($value, $this->internalGetUserRole(Yii::$app->user->identity));
+                $context = $this->trigger($event);
             }
 
             // Migrate the context errors to the virtual attribute

@@ -13,7 +13,6 @@ use yii\base\Model;
 use yii\db\BaseActiveRecord;
 use yii\helpers\Json;
 use yii\web\IdentityInterface;
-use yii\web\User;
 
 /**
  * Class Context
@@ -23,14 +22,9 @@ use yii\web\User;
 class Context extends Model implements StateMachineContext
 {
     /**
-     * @var array|null - role of event initiator
+     * @var IdentityInterface - user that initiated the event
      */
-    private $roles;
-
-    /**
-     * @var BaseActiveRecord - user that initiated the event
-     */
-    private $user;
+    private $identity;
 
     /**
      * @var BaseActiveRecord
@@ -64,10 +58,13 @@ class Context extends Model implements StateMachineContext
 
     /**
      * @return interfaces\StateMachineEvent[]
+     * @throws exceptions\InvalidSchemaException
+     * @throws exceptions\StateMachineNotFoundException
+     * @throws exceptions\StateNotFoundException
      */
     public function getPossibleEvents()
     {
-        return $this->sm->getState($this->model->{$this->attr})->getEvents($this->role, $this);
+        return $this->sm->getState($this->model->{$this->attr})->getEvents($this);
     }
 
     /**
@@ -97,39 +94,19 @@ class Context extends Model implements StateMachineContext
     }
 
     /**
-     * @return string
+     * @return IdentityInterface|null
      */
-    public function getRole()
+    public function getIdentity()
     {
-        return $this->role;
+        return $this->identity;
     }
 
     /**
-     * @param string $role
-     * @return $this
+     * @return bool
      */
-    public function setRole($role)
+    public function isModelDeleted()
     {
-        $this->role = $role;
-        return $this;
-    }
-
-    /**
-     * @return BaseActiveRecord|User
-     */
-    public function getUser()
-    {
-        return $this->user;
-    }
-
-    /**
-     * @param BaseActiveRecord $user
-     * @return $this
-     */
-    public function setUser($user)
-    {
-        $this->user = $user;
-        return $this;
+        return $this->model->{$this->virtAttr}->isModelDeleted();
     }
 
     /**
@@ -138,16 +115,6 @@ class Context extends Model implements StateMachineContext
     public function getModel()
     {
         return $this->model;
-    }
-
-    /**
-     * @param BaseActiveRecord $model
-     * @return $this
-     */
-    public function setModel($model)
-    {
-        $this->model = $model;
-        return $this;
     }
 
     /**
@@ -165,16 +132,6 @@ class Context extends Model implements StateMachineContext
     public function getSm()
     {
         return $this->sm;
-    }
-
-    /**
-     * @param StateMachine $sm
-     * @return $this
-     */
-    public function setSm($sm)
-    {
-        $this->sm = $sm;
-        return $this;
     }
 
     /**
@@ -277,36 +234,24 @@ class Context extends Model implements StateMachineContext
     }
 
     /**
-     * @return bool
-     */
-    public function isModelDeleted()
-    {
-        $model = $this->getModel();
-        $virtAtr = $this->getVirtAttr();
-        /** @var StateMachineBehavior $smBehavior */
-        $smBehavior = $model->{$virtAtr};
-
-        return $smBehavior->isModelDeleted();
-    }
-
-    /**
      * @param StateMachine $sm
-     * @param array|null $role
-     * @param IdentityInterface $user - model of user initiating the context
+     * @param IdentityInterface $identity - model of user initiating the context
      * @param BaseActiveRecord $model - model that holds the attribute controlled by the state machine
      * @param string $attr
      * @param string $virtAttr
      * @return static
      */
-    public static function nu($sm, $roles, $user, $model, $attr, $virtAttr)
+    public static function nu($sm, $identity, $model, $attr, $virtAttr)
     {
-        return new static([
-            'sm' => $sm,
-            'roles' => $roles,
-            'user' => $user,
-            'model' => $model,
+        $rVal = new static([
             'attr' => $attr,
             'virtAttr' => $virtAttr,
         ]);
+
+        $rVal->sm = $sm;
+        $rVal->identity = $identity;
+        $rVal->model = $model;
+
+        return $rVal;
     }
 }

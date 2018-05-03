@@ -11,17 +11,12 @@ use ptheofan\statemachine\Condition;
 use ptheofan\statemachine\interfaces\StateMachineContext;
 use Yii;
 
-/**
- * Class Permission
- *
- * @package ptheofan\statemachine\conditions
- */
 class Permission extends Condition
 {
     /**
      * @var string
      */
-    public $permission;
+    public $perm;
 
     /**
      * Execute the command on the $context
@@ -31,10 +26,10 @@ class Permission extends Condition
      */
     public function isValid(StateMachineContext $context)
     {
-        if (empty($this->permission)) {
+        if (empty($this->perm)) {
             return true;
         }
 
-        return Yii::$app->user->can($this->permission[0], ['context' => $context, 'permission' => $this]);
+        return Yii::$app->user->can($this->perm, ['context' => $context, 'permission' => $this]);
     }
 }

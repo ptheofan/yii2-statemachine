@@ -7,13 +7,19 @@
         </enter>
 
         <event target="verified" label="verify" name="verify">
-            <role>owner</role>
+            <conditions>
+                <rbac class="Permission">owner</rbac>
+            </conditions>
         </event>
         <event target="draft" label="resend.verification.email" name="resend-verification-email">
-            <role>owner</role>
+            <conditions>
+                <permission>owner</permission>
+            </conditions>
         </event>
         <event target="cancelled" label="delete.account" name="delete-account">
-            <role>owner</role>
+            <conditions>
+                <permission>owner</permission>
+            </conditions>
         </event>
 
         <exit>
@@ -27,7 +33,9 @@
         </enter>
 
         <event target="cancelled" label="delete.account">
-            <role>owner</role>
+            <conditions>
+                <permission>owner</permission>
+            </conditions>
         </event>
 
         <exit>
@@ -41,10 +49,14 @@
         </enter>
 
         <event target="draft" label="recover">
-            <role>owner</role>
+            <conditions>
+                <permission>owner</permission>
+            </conditions>
         </event>
         <timeout target="cleanup" label="timeout" days="1">
-            <role>system</role>
+            <conditions>
+                <permission>owner</permission>
+            </conditions>
         </timeout>
 
         <exit>

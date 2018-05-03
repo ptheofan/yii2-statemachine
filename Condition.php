@@ -70,12 +70,12 @@ abstract class Condition extends BaseObject
             $config['class'] = $sm->conditionsNamespace . '\\' . $config['class'];
         }
 
-        $condition = Yii::createObject($config);
-        if (!($condition instanceof Condition)) {
+        $command = Yii::createObject($config);
+        if (!($command instanceof Condition)) {
             throw new InvalidSchemaException("All state machine conditions must derive from ptheofan\\statemachine\\Condition");
         }
 
-        $condition->sm = $sm;
-        return $condition;
+        $command->sm = $sm;
+        return $command;
     }
 }

@@ -13,9 +13,9 @@ use ptheofan\statemachine\interfaces\StateMachineEvent;
 use ptheofan\statemachine\interfaces\StateMachineState;
 use ptheofan\statemachine\interfaces\StateMachineTimeout;
 use SimpleXMLElement;
-use yii\base\Object;
+use yii\base\BaseObject;
 
-class State extends Object implements StateMachineState
+class State extends BaseObject implements StateMachineState
 {
     /**
      * @var StateMachine
@@ -133,18 +133,17 @@ class State extends Object implements StateMachineState
     }
 
     /**
-     * @param string|null $role
      * @param StateMachineContext|null $context
      * @return interfaces\StateMachineEvent[]
      */
-    public function getEvents($role = null, $context = null)
+    public function getEvents($context = null)
     {
-        if ($role === null) {
+        if ($context === null) {
             return $this->events;
         } else {
-            return array_filter($this->events, function($e) use ($role, $context) {
+            return array_filter($this->events, function($e) use ($context) {
                 /** @var StateMachineEvent $e */
-                return $e->isEligible($role, $context);
+                return $e->isValid($context);
             });
         }
     }
@@ -175,16 +174,16 @@ class State extends Object implements StateMachineState
 
     /**
      * @param string $label
-     * @param string|null $role
+     * @param StateMachineContext $context
      * @return StateMachineEvent|null
      */
-    public function getEventByLabel($label, $role = null)
+    public function getEventByLabel($label, $context)
     {
         $events = array_merge($this->getEvents(), $this->getTimeOuts());
         /** @var StateMachineEvent $event */
         foreach ($events as $event) {
             if ($event->getLabel() === $label) {
-                if ($event->isRoleValid($role)) {
+                if ($event->isValid($context)) {
                     return $event;
                 }
             }
