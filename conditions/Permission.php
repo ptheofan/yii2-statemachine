@@ -35,6 +35,6 @@ class Permission extends Condition
             return true;
         }
 
-        return Yii::$app->user->can($this->permission[0], ['context' => $context, 'permission' => $this]);
+        return Yii::$app->user->can($this->permission, ['context' => $context, 'permission' => $this]);
     }
 }
