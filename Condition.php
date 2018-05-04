@@ -55,14 +55,21 @@ abstract class Condition extends BaseObject
             $config[$key] = (string)$value;
         }
 
-        /** @var SimpleXMLElement $child */
-        foreach($xml->children() as $child) {
-            $config[(string)$child->getName()][] = (string)$child;
+        if ($xml->count() > 0) {
+            /** @var SimpleXMLElement $child */
+            foreach ($xml->children() as $child) {
+                $config[(string)$child->getName()][] = (string)$child;
+            }
+        } else {
+            $v = trim((string)$xml[0]);
+            if (!empty($v)) {
+                $config[$xml->getName()] = $v;
+            }
         }
 
         // If no class is defined use the node name as class
         if (!isset($config['class'])) {
-            $config['class'] = ucfirst((string)$child->getName());
+            $config['class'] = ucfirst((string)$xml->getName());
         }
 
         // If no namespace is defined, use the $sm default commands namespace
