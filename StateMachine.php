@@ -189,21 +189,26 @@ class StateMachine extends Component
             // Cleanup old timeouts
             Timeout::cleanUp($context);
 
-            // Entering new state...
-            $context->getModel()->{$context->getAttr()} = $event->getTarget();
-            if ($context->getModel()->hasMethod('save')) {
-                $context->getModel()->save(false, [$context->getAttr()]);
-            }
+            // Entering new state... (ignore if exit commands deleted the model)
+            if (!$context->isModelDeleted()) {
+                $context->getModel()->{$context->getAttr()} = $event->getTarget();
+                if ($context->getModel()->hasMethod('save')) {
+                    $context->getModel()->save(false, [$context->getAttr()]);
+                }
 
-            foreach ($event->getTargetState()->getEnterCommands() as $command) {
-                if (!$command->execute($context)) {
-                    return false;
+                foreach ($event->getTargetState()->getEnterCommands() as $command) {
+                    if (!$command->execute($context)) {
+                        return false;
+                    }
                 }
             }
 
-            // Register the new timeouts
-            foreach ($event->getTargetState()->getTimeOuts() as $timeout) {
-                $timeout->register($context);
+            // Register timeouts only if model is not deleted
+            if (!$context->isModelDeleted()) {
+                // Register the new timeouts
+                foreach ($event->getTargetState()->getTimeOuts() as $timeout) {
+                    $timeout->register($context);
+                }
             }
 
             // Update Journal - if applicable
