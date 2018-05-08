@@ -238,7 +238,11 @@ class StateMachine extends Component
         /** @var yii\db\Transaction|false $txn */
         try {
             // Entering state...
-            $context->getModel()->{$context->getAttr()} = $this->getInitialStateValue();
+            if (empty($context->getModel()->{$context->getAttr()})) {
+                // Set StateMachine initial value if no value is already set
+                $context->getModel()->{$context->getAttr()} = $this->getInitialStateValue();
+            }
+            
             $state = $this->getState($this->getInitialStateValue());
             foreach ($state->getEnterCommands() as $command) {
                 if (!$command->execute($context)) {

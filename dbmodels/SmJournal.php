@@ -69,7 +69,7 @@ class SmJournal extends ActiveRecord implements StateMachineJournal
             $j->to_state = $event->getTargetState()->getValue();
         } else {
             $j->from_state = null;
-            $j->to_state = $context->getSm()->getInitialStateValue();
+            $j->to_state = $context->getModel()->{$context->getAttr()};
         }
 
         $j->save();
