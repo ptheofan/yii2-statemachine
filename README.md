@@ -11,6 +11,7 @@ State Machine for modern Web Apps for the Yii2 framework
 1. Support for RBAC systems - Define who can see and trigger an event
 1. Visual Representation of your StateMachine
 1. Simple and powerful StateMachine definition via XML
+1. Conditional Transitions (strategy)
 
 ## Documentation
 - Documentation and examples can be found in the [wiki](https://github.com/ptheofan/yii2-statemachine/wiki) pages.

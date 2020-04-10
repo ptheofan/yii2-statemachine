@@ -55,8 +55,9 @@ class AttributeCheck extends Condition
         $value = $context->getModel()->{$this->getter};
         if ($this->strictMode) {
             return $value === $this->expectedValue;
-        } else {
-            return $value == $this->expectedValue;
         }
+
+        /** @noinspection TypeUnsafeComparisonInspection */
+        return $value == $this->expectedValue;
     }
 }
